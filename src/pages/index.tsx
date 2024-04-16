@@ -1,6 +1,5 @@
 import { Center } from '@chakra-ui/react';
 import Head from 'next/head';
-import Link from 'next/link';
 import { StaffProductCard } from '~/components/StaffProductCard';
 
 import { api } from '~/utils/api';
