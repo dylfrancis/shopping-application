@@ -1,20 +1,134 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model credit_card {
+  card_id         Int       @id
+  cust_id         Int?
+  firstname       String?   @db.VarChar(100)
+  lastname        String?   @db.VarChar(100)
+  number          String?   @db.VarChar(100)
+  security_number String?   @db.VarChar(100)
+  expiry_date     DateTime? @db.Date
+  zip             String?   @db.VarChar(10)
+  customer        customer? @relation(fields: [cust_id], references: [cust_id], onDelete: NoAction, onUpdate: NoAction)
+  orders          orders[]
+}
 
-    @@index([name])
+model customer {
+  cust_id          Int                @id
+  first_name       String?            @db.VarChar(100)
+  last_name        String?            @db.VarChar(100)
+  balance          Decimal?           @db.Decimal(10, 2)
+  credit_card      credit_card[]
+  customer_address customer_address[]
+  orders           orders[]
+}
+
+model customer_address {
+  cust_address_id Int       @id
+  cust_id         Int?
+  street_number   String?   @db.VarChar(100)
+  street_name     String?   @db.VarChar(100)
+  city            String?   @db.VarChar(100)
+  state           String?   @db.VarChar(100)
+  zip             String?   @db.VarChar(10)
+  customer        customer? @relation(fields: [cust_id], references: [cust_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model delivery_plan {
+  delivery_plan_id Int       @id
+  order_id         Int?
+  delivery_type    String?   @db.VarChar(100)
+  delivery_price   Decimal?  @db.Decimal(10, 2)
+  delivery_date    DateTime? @db.Date
+  ship_date        DateTime? @db.Date
+  orders           orders?   @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model order_items {
+  order_item_id Int      @id
+  order_id      Int?
+  product_id    Int?
+  quantity      Int?
+  orders        orders?  @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  product       product? @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model orders {
+  order_id       Int             @id
+  customer_id    Int?
+  status         String?         @db.VarChar(100)
+  credit_card_id Int?
+  order_date     DateTime?       @db.Date
+  delivery_plan  delivery_plan[]
+  order_items    order_items[]
+  credit_card    credit_card?    @relation(fields: [credit_card_id], references: [card_id], onDelete: NoAction, onUpdate: NoAction)
+  customer       customer?       @relation(fields: [customer_id], references: [cust_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model product {
+  product_id  Int           @id
+  name        String?       @db.VarChar(100)
+  price       Decimal?      @db.Decimal(10, 2)
+  category    String?       @db.VarChar(100)
+  type        String?       @db.VarChar(100)
+  brand       String?       @db.VarChar(100)
+  size        String?       @db.VarChar(100)
+  description String?
+  order_items order_items[]
+  stock       stock[]
+}
+
+model staff {
+  staff_id      Int             @id
+  first_name    String?         @db.VarChar(100)
+  last_name     String?         @db.VarChar(100)
+  salary        Decimal?        @db.Decimal(10, 2)
+  job_title     String?         @db.VarChar(100)
+  staff_address staff_address[]
+}
+
+model staff_address {
+  staff_address_id Int     @id
+  staff_id         Int?
+  street_number    String? @db.VarChar(100)
+  street_name      String? @db.VarChar(100)
+  city             String? @db.VarChar(100)
+  state            String? @db.VarChar(100)
+  zip              String? @db.VarChar(10)
+  staff            staff?  @relation(fields: [staff_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model stock {
+  stock_id     Int        @id
+  product_id   Int?
+  warehouse_id Int?
+  quantity     Int?
+  product      product?   @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  warehouse    warehouse? @relation(fields: [warehouse_id], references: [warehouse_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model warehouse {
+  warehouse_id      Int                 @id
+  warehouse_name    String?             @db.VarChar(100)
+  stock             stock[]
+  warehouse_address warehouse_address[]
+}
+
+model warehouse_address {
+  warehouse_address_id Int        @id
+  warehouse_id         Int?
+  street_number        String?    @db.VarChar(100)
+  street_name          String?    @db.VarChar(100)
+  city                 String?    @db.VarChar(100)
+  state                String?    @db.VarChar(100)
+  zip                  String?    @db.VarChar(10)
+  warehouse            warehouse? @relation(fields: [warehouse_id], references: [warehouse_id], onDelete: NoAction, onUpdate: NoAction)
 }
