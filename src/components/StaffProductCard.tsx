@@ -3,6 +3,7 @@ import {
   Card,
   CardBody,
   Divider,
+  Flex,
   Heading,
   Stack,
   Text
@@ -15,8 +16,10 @@ export const StaffProductCard = (props: {
   product: product;
   key: Key;
   onDelete?: () => void;
+  isDeleteLoading?: boolean;
+  onModify?: () => void;
 }) => {
-  const { product, key, onDelete } = props;
+  const { product, key, onDelete, isDeleteLoading = false, onModify } = props;
   return (
     <Card key={key}>
       <CardBody>
@@ -25,9 +28,18 @@ export const StaffProductCard = (props: {
           <Text>{product.description}</Text>
           <Text>{formatCurrency(product.price)}</Text>
           <Divider></Divider>
-          <Button colorScheme="red" onClick={onDelete}>
-            Delete
-          </Button>
+          <Flex gap={4} alignItems="center" justifyContent="center">
+            <Button
+              colorScheme="red"
+              onClick={onDelete}
+              isLoading={isDeleteLoading}
+            >
+              Delete
+            </Button>
+            <Button colorScheme="blue" onClick={onModify}>
+              Modify
+            </Button>
+          </Flex>
         </Stack>
       </CardBody>
     </Card>
