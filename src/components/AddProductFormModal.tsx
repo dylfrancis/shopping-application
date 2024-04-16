@@ -38,23 +38,22 @@ export const AddProductFormModal = (props: {
   const { mutate, isPending } = api.product.create.useMutation({
     onSuccess: () => {
       void ctx.product.getAll.invalidate();
-    }
-  });
-
-  const addProduct = (data: AddProductForm) => {
-    try {
-      const newData = {
-        ...data,
-        price: data.price ? Number(data.price) : null
-      };
-      mutate(newData);
-      reset();
-    } catch {
+    },
+    onError: () => {
       toast({
         title: 'Unable to add product',
         status: 'error'
       });
     }
+  });
+
+  const addProduct = (data: AddProductForm) => {
+    const newData = {
+      ...data,
+      price: data.price ? Number(data.price) : null
+    };
+    mutate(newData);
+    reset();
   };
 
   return (

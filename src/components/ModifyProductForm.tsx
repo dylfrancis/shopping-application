@@ -39,22 +39,21 @@ export const ModifyProductFormModal = (props: {
   const { mutate, isPending } = api.product.update.useMutation({
     onSuccess: () => {
       void ctx.product.getAll.invalidate();
-    }
-  });
-
-  const modifyProduct = (data: Product) => {
-    try {
-      const newData = {
-        ...data,
-        price: data.price ? Number(data.price) : null
-      };
-      mutate(newData);
-    } catch {
+    },
+    onError: () => {
       toast({
         title: 'Unable to modify product',
         status: 'error'
       });
     }
+  });
+
+  const modifyProduct = (data: Product) => {
+    const newData = {
+      ...data,
+      price: data.price ? Number(data.price) : null
+    };
+    mutate(newData);
   };
 
   return (

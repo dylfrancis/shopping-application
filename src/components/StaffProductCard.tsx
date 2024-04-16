@@ -6,22 +6,42 @@ import {
   Flex,
   Heading,
   Stack,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react';
 import { type product } from '@prisma/client';
-import { type Key } from 'react';
+import { api } from '~/utils/api';
 import { formatCurrency } from '~/utils/general';
 
 export const StaffProductCard = (props: {
   product: product;
-  key: Key;
-  onDelete?: () => void;
-  isDeleteLoading?: boolean;
   onModify?: () => void;
+  id: number;
 }) => {
-  const { product, key, onDelete, isDeleteLoading = false, onModify } = props;
+  const { product, id, onModify } = props;
+
+  const toast = useToast();
+
+  const ctx = api.useUtils();
+
+  const { mutate, isPending } = api.product.delete.useMutation({
+    onSuccess: () => {
+      void ctx.product.getAll.invalidate();
+    },
+    onError: () => {
+      toast({
+        title: 'Unable to delete product',
+        status: 'error'
+      });
+    }
+  });
+
+  const deleteProduct = (id: number) => {
+    mutate({ id: id });
+  };
+
   return (
-    <Card key={key}>
+    <Card key={id}>
       <CardBody>
         <Stack>
           <Heading>{product.name}</Heading>
@@ -31,8 +51,8 @@ export const StaffProductCard = (props: {
           <Flex gap={4} alignItems="center" justifyContent="center">
             <Button
               colorScheme="red"
-              onClick={onDelete}
-              isLoading={isDeleteLoading}
+              onClick={() => deleteProduct(id)}
+              isLoading={isPending}
             >
               Delete
             </Button>
