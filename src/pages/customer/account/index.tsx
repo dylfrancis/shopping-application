@@ -9,11 +9,12 @@ import { api } from '~/utils/api';
 
 export default function Account(){
     const ctx = api.useUtils();
-  const { Address_data } = api.credit_card.getAll.useQuery();
-  const { credit_card_data } = api.credit_card.getAll.useQuery();
+  const { data: CreditCardData } = api.CreditCard.getAll.useQuery();
+  const { data: Addressdata } = api.Address.getAll.useQuery();
   const { mutate } = api.product.delete.useMutation({
     onSuccess: () => {
-      void ctx.credit_card.getAll.invalidate();
+      void ctx.CreditCard.getAll.invalidate();
+      void ctx.Address.getAll.invalidate();
     }
   });
 
@@ -29,12 +30,12 @@ export default function Account(){
           <h2>Addresses:</h2>
         </div>
         <Flex flexWrap="wrap" justifyContent="flex-start">
-          {data?.map((data) => (
+          {Addressdata?.map((Address) => (
             <AddressCard
-              product={data}
-              key={data.product_id}
+              customer_address = {Address}
+              key={Address.cust_address_id}
               onDelete={() => {
-                mutate({ id: data.product_id });
+                mutate({ id: Address.cust_address_id });
               }}
             />
           ))}
@@ -43,12 +44,12 @@ export default function Account(){
           <h2>Credit Cards:</h2>
         </div>
         <Flex flexWrap="wrap" justifyContent="flex-start">
-          {data?.map((data) => (
+          {CreditCardData?.map((CreditCard) => (
             <CreditCardCard
-              product={data}
-              key={data.product_id}
+              Credit_Card = {CreditCard}
+              key={CreditCard.card_id}
               onDelete={() => {
-                mutate({ id: data.product_id });
+                mutate({ id: CreditCard.card_id });
               }}
             />
           ))}
