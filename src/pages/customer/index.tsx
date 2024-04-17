@@ -1,6 +1,6 @@
 import { Center } from '@chakra-ui/react';
 import Head from 'next/head';
-import { StaffProductCard } from '~/components/StaffProductCard';
+import { CustProductCard } from '~/components/CustProductCard';
 
 import { api } from '~/utils/api';
 
@@ -26,7 +26,7 @@ export default function Customer() {
         </div>
         <Center>
           {data?.map((data) => (
-            <StaffProductCard
+            <CustProductCard
               product={data}
               key={data.product_id}
               onDelete={() => {
