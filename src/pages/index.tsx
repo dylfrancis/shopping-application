@@ -1,7 +1,7 @@
-import { Button, Grid, GridItem, Skeleton } from '@chakra-ui/react';
+import { Button, Grid, GridItem, Input, Skeleton } from '@chakra-ui/react';
 import { type product } from '@prisma/client';
 import Head from 'next/head';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AddProductFormModal } from '~/components/AddProductFormModal';
 import { ModifyProductFormModal } from '~/components/ModifyProductForm';
 import { StaffProductCard } from '~/components/StaffProductCard';
@@ -15,6 +15,15 @@ export default function Home() {
   );
   const [isModifyProductOpen, setIsModifyProductOpen] = useState(false);
   const { data, isLoading } = api.product.getAll.useQuery();
+  const [searchInput, setSearchInput] = useState('');
+  const search = api.product.getSearch.useQuery({
+    input: searchInput
+  });
+
+  const filteredData = useMemo(
+    () => (searchInput ? search.data : data),
+    [data, search.data, searchInput]
+  );
 
   return (
     <>
@@ -24,31 +33,34 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+        <Input onChange={(e) => setSearchInput(e.target.value)} />
         <Button onClick={() => setIsAddProductOpen(true)} colorScheme="blue">
           Add Product
         </Button>
-        <Grid
-          templateColumns="repeat(4, 2fr)"
-          autoRows="1fr"
-          justifyContent="center"
-          alignItems="center"
-          gap={10}
-        >
-          {data?.map((data) => (
-            <GridItem key={data.product_id} w="100%">
-              <Skeleton isLoaded={!isLoading}>
-                <StaffProductCard
-                  product={data}
-                  id={data.product_id}
-                  onModify={() => {
-                    setModifiedProduct(data);
-                    setIsModifyProductOpen(true);
-                  }}
-                />
-              </Skeleton>
-            </GridItem>
-          ))}
-        </Grid>
+        <div style={{ padding: 20 }}>
+          <Grid
+            templateColumns="repeat(4, 2fr)"
+            autoRows="1fr"
+            justifyContent="center"
+            alignItems="center"
+            gap={10}
+          >
+            {filteredData?.map((data) => (
+              <GridItem key={data.product_id} w="100%">
+                <Skeleton isLoaded={!isLoading}>
+                  <StaffProductCard
+                    product={data}
+                    id={data.product_id}
+                    onModify={() => {
+                      setModifiedProduct(data);
+                      setIsModifyProductOpen(true);
+                    }}
+                  />
+                </Skeleton>
+              </GridItem>
+            ))}
+          </Grid>
+        </div>
         <AddProductFormModal
           isOpen={isAddProductOpen}
           onClose={() => setIsAddProductOpen(false)}

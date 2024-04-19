@@ -1,9 +1,9 @@
 import {
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   Divider,
-  Flex,
   Heading,
   Stack,
   Text,
@@ -48,9 +48,10 @@ export const StaffProductCard = (props: {
           <Text>{product.description}</Text>
           <Text>{formatCurrency(product.price)}</Text>
           <Divider></Divider>
-          <Flex gap={4} alignItems="center" justifyContent="center">
+          <ButtonGroup spacing={4} alignItems="center" justifyContent="center">
             <Button
               colorScheme="red"
+              variant="outline"
               onClick={() => deleteProduct(id)}
               isLoading={isPending}
             >
@@ -59,7 +60,7 @@ export const StaffProductCard = (props: {
             <Button colorScheme="blue" onClick={onModify}>
               Modify
             </Button>
-          </Flex>
+          </ButtonGroup>
         </Stack>
       </CardBody>
     </Card>

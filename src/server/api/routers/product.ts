@@ -1,3 +1,4 @@
+import { type product } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
@@ -22,9 +23,23 @@ export const ProductDeleteInput = z.object({
   id: z.number()
 });
 
+export const SearchInput = z.object({
+  input: z.string()
+});
+
 export const productRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.product.findMany();
+  }),
+
+  getSearch: publicProcedure.input(SearchInput).query(({ ctx, input }) => {
+    const searchQuery = ctx.db.$queryRaw<
+      product[]
+    >`SELECT * FROM product WHERE name ILIKE '%' || ${input.input} || '%'`;
+
+    if (!input.input) return ctx.db.product.findMany();
+
+    return searchQuery;
   }),
 
   create: publicProcedure
