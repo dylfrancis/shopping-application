@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -74,7 +75,7 @@ model orders {
 }
 
 model product {
-  product_id  Int           @id
+  product_id  Int           @id @default(autoincrement())
   name        String?       @db.VarChar(100)
   price       Decimal?      @db.Decimal(10, 2)
   category    String?       @db.VarChar(100)
