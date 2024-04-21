@@ -12,7 +12,8 @@ import { customerRouter } from './routers/customer';
 export const appRouter = createTRPCRouter({
   product: productRouter,
   CreditCard: CreditCardRouter,
-  Address: addressRouter
+  address: addressRouter,
+  customer: customerRouter
 });
 
 // export type definition of API

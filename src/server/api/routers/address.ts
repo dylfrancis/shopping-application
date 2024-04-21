@@ -8,7 +8,7 @@ export const AddressCreateInput = z.object({
   street_name: z.string().nullable(),
   city: z.string().nullable(),
   state: z.string().nullable(),
-  zip: z.string().nullable(),
+  zip: z.string().nullable()
 });
 
 export const AddressUpdateInput = z

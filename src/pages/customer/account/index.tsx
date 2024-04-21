@@ -26,10 +26,8 @@ export default function Account() {
     {} as customer_address
   );
   const [isModifyAddressOpen, setIsModifyAddressOpen] = useState(false);
-
-  const ctx = api.useUtils();
   const { data: CreditCardData } = api.CreditCard.getAll.useQuery();
-  const { data: Addressdata } = api.Address.getAll.useQuery();
+  const { data: Addressdata } = api.address.getAll.useQuery();
 
   return (
     <>
