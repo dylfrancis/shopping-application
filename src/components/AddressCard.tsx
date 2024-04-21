@@ -1,35 +1,66 @@
 import {
     Button,
+    ButtonGroup,
     Card,
     CardBody,
     Divider,
-    Heading,
     Stack,
-    Text
+    Text,
+    useToast
   } from '@chakra-ui/react';
   import { type customer_address } from '@prisma/client';
-  import { type Key } from 'react';
+  import { api } from '~/utils/api';
 
   export const AddressCard = (props: {
     customer_address: customer_address;
-    key: Key;
-    onDelete?: () => void;
+    onModify?: () => void;
+    id: number;
   }) => {
-    const { customer_address, key, onDelete } = props;
+    const { customer_address, id, onModify } = props;
+
+    const toast = useToast();
+
+    const ctx = api.useUtils();
+
+    const { mutate, isPending } = api.Address.delete.useMutation({
+        onSuccess: () => {
+          void ctx.Address.getAll.invalidate();
+        },
+        onError: () => {
+          toast({
+            title: 'Unable to delete Address',
+            status: 'error'
+          });
+        }
+      });
+    
+      const deleteAddress = (id: number) => {
+        mutate({ id: id });
+      };
+    
+
+
     return (
-      <Card key={key}>
+      <Card key={id}>
         <CardBody>
           <Stack>
             <Text>{customer_address.street_number + " " + customer_address.street_name}</Text>
             <Text>{customer_address.city + " " + customer_address.state}</Text>
             <Text>{customer_address.zip}</Text>
             <Divider></Divider>
-            <Button colorScheme="red" onClick={onDelete}>
+            <ButtonGroup spacing={4} alignItems="center" justifyContent="center">
+            <Button
+              colorScheme="red"
+              variant="outline"
+              onClick={() => deleteAddress(id)}
+              isLoading={isPending}
+            >
               Delete
             </Button>
-            <Button colorScheme="blue" /*onClick={MODIFY FUNCTION}*/>
-              Edit
+            <Button colorScheme="blue" onClick={onModify}>
+              Modify
             </Button>
+          </ButtonGroup>
           </Stack>
         </CardBody>
       </Card>
