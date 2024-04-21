@@ -1,10 +1,28 @@
-import { Center } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Divider,
+  Flex,
+  Grid,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay
+} from '@chakra-ui/react';
+import { type customer, type product } from '@prisma/client';
 import Head from 'next/head';
 import { CustProductCard } from '~/components/CustProductCard';
-
+import { FaShoppingCart, FaTrash } from 'react-icons/fa';
 import { api } from '~/utils/api';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { formatCurrency } from '~/utils/general';
 
 export default function Customer() {
+  const [shoppingCartOpen, setShoppingCartOpen] = useState(false);
+  const [user, setUser] = useState<customer | undefined>(undefined);
+  const router = useRouter();
   const ctx = api.useUtils();
   const { data } = api.product.getAll.useQuery();
   const { mutate } = api.product.delete.useMutation({
@@ -12,6 +30,126 @@ export default function Customer() {
       void ctx.product.getAll.invalidate();
     }
   });
+
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      const user = localStorage.getItem('customer');
+      if (!user) {
+        void router.push('/');
+      } else {
+        setUser(JSON.parse(user) as unknown as customer);
+      }
+    } else {
+      console.error('Web Storage is not supported in this environment.');
+    }
+  }, [router]);
+
+  const addToCart = (data: product) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const cart: product[] = JSON.parse(
+      localStorage.getItem('cart') ?? JSON.stringify([] as product[])
+    );
+
+    localStorage.setItem('cart', JSON.stringify([...cart, data]));
+  };
+
+  const ShoppingCartModal = () => {
+    interface ProductWithPrice extends product {
+      totalItems: number;
+      totalPrice: number;
+    }
+    const [finalProducts, setFinalProducts] = useState(
+      [] as ProductWithPrice[]
+    );
+
+    useEffect(() => {
+      if (typeof localStorage === 'undefined') return;
+
+      const shoppingCartStorage = localStorage.getItem('cart');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const shoppingCartItems: product[] | undefined = shoppingCartStorage
+        ? JSON.parse(shoppingCartStorage)
+        : undefined;
+
+      const productMap: Record<string, ProductWithPrice> = {};
+
+      shoppingCartItems?.forEach((product, index) => {
+        const key = product.name ?? 'product' + index;
+        if (productMap[key]) {
+          productMap[key]!.totalPrice += Number(product.price ?? 0);
+          productMap[key]!.totalItems++;
+        } else {
+          productMap[key] = {
+            ...product,
+            totalPrice: Number(product.price ?? 0),
+            totalItems: 1
+          };
+        }
+      });
+
+      setFinalProducts(Object.values(productMap));
+    }, []);
+
+    const deleteItem = (product_id: number) => {
+      const shoppingCartStorage = localStorage.getItem('cart');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const shoppingCartItems: product[] | undefined = shoppingCartStorage
+        ? JSON.parse(shoppingCartStorage)
+        : undefined;
+
+      localStorage.setItem(
+        'cart',
+        JSON.stringify(
+          shoppingCartItems?.filter(
+            (product) => product_id !== product.product_id
+          )
+        )
+      );
+      setFinalProducts(
+        finalProducts.filter((product) => product.product_id !== product_id)
+      );
+    };
+
+    return (
+      <Modal
+        isOpen={shoppingCartOpen}
+        onClose={() => setShoppingCartOpen(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Shopping Cart</ModalHeader>
+          <ModalBody>
+            <Container>
+              {finalProducts?.map((value, index) => (
+                <>
+                  {index > 0 && <Divider />}
+                  <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    padding="4px"
+                  >
+                    <Box key={index}>
+                      {`(${value.totalItems})`} {value.name}
+                    </Box>
+                    <Flex alignItems="center" gap={4}>
+                      <div>{formatCurrency(value.totalPrice)}</div>
+                      <FaTrash
+                        onClick={() => {
+                          deleteItem(value.product_id);
+                        }}
+                      />
+                    </Flex>
+                  </Flex>
+                </>
+              ))}
+            </Container>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    );
+  };
 
   return (
     <>
@@ -21,18 +159,30 @@ export default function Customer() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div>Customer shopping page!!!!!!</div>
-        <Center>
+        <Flex alignItems="center" justifyContent="space-between">
+          <div>
+            Welcome {user?.first_name} {user?.last_name}
+          </div>
+          <FaShoppingCart onClick={() => setShoppingCartOpen(true)} />
+        </Flex>
+        <Grid
+          templateColumns="repeat(4, 2fr)"
+          autoRows="1fr"
+          justifyContent="center"
+          alignItems="center"
+          gap={10}
+        >
           {data?.map((data) => (
             <CustProductCard
               product={data}
               key={data.product_id}
-              onDelete={() => {
-                mutate({ id: data.product_id });
+              onAdd={() => {
+                addToCart(data);
               }}
             />
           ))}
-        </Center>
+        </Grid>
+        <ShoppingCartModal />
       </main>
     </>
   );

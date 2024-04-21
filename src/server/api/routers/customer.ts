@@ -9,7 +9,6 @@ export const customerRouter = createTRPCRouter({
   getOne: publicProcedure
     .input(GetUserInput)
     .mutation(async ({ ctx, input }) => {
-      console.log('fetching');
       return await ctx.db.customer.findFirstOrThrow({
         where: {
           username: input.username

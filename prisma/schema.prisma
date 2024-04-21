@@ -55,7 +55,7 @@ model delivery_plan {
 }
 
 model order_items {
-  order_item_id Int      @id
+  order_item_id Int      @id @default(autoincrement())
   order_id      Int?
   product_id    Int?
   quantity      Int?
@@ -64,7 +64,7 @@ model order_items {
 }
 
 model orders {
-  order_id       Int             @id
+  order_id       Int             @id @default(autoincrement())
   customer_id    Int?
   status         String?         @db.VarChar(100)
   credit_card_id Int?

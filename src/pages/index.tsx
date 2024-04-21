@@ -13,8 +13,9 @@ export default function Login() {
   });
 
   const handleLoggedIn = useCallback(async () => {
-    const customer = localStorage.getItem('customer');
-    if (customer) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const localCustomer = localStorage.getItem('customer');
+    if (localCustomer) {
       await router.push('/customer');
     }
   }, [router]);
@@ -23,12 +24,15 @@ export default function Login() {
     void handleLoggedIn();
   }, [handleLoggedIn]);
 
-  const { data, mutate } = api.customer.getOne.useMutation();
+  const { data, mutate } = api.customer.getOne.useMutation({
+    onSuccess: (response) => {
+      localStorage.setItem('customer', JSON.stringify(response));
+      void router.push('/customer');
+    }
+  });
 
   const onSubmit = async (formData: { username: string }) => {
     mutate({ username: formData.username });
-    localStorage.setItem('customer', JSON.stringify(data));
-    await router.push('/customer');
   };
 
   return (
