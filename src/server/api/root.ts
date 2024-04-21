@@ -1,6 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
 import { productRouter } from './routers/product';
-import { AddressRouter } from './routers/address';
+import { addressRouter } from './routers/address';
 import { CreditCardRouter } from './routers/credit_card';
 
 /**
@@ -11,7 +11,7 @@ import { CreditCardRouter } from './routers/credit_card';
 export const appRouter = createTRPCRouter({
   product: productRouter,
   CreditCard: CreditCardRouter,
-  Address: AddressRouter
+  Address: addressRouter
 
 });
 
