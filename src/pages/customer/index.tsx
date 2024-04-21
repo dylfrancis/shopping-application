@@ -21,9 +21,7 @@ export default function Customer() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div>
-          Customer shopping page!!!!!!
-        </div>
+        <div>Customer shopping page!!!!!!</div>
         <Center>
           {data?.map((data) => (
             <CustProductCard

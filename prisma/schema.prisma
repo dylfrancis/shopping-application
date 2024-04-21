@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -27,6 +27,7 @@ model customer {
   first_name       String?            @db.VarChar(100)
   last_name        String?            @db.VarChar(100)
   balance          Decimal?           @db.Decimal(10, 2)
+  username         String?            @db.VarChar(100)
   credit_card      credit_card[]
   customer_address customer_address[]
   orders           orders[]
