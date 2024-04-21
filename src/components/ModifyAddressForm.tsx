@@ -36,9 +36,9 @@ import {
       defaultValues: address
     });
   
-    const { mutate, isPending } = api.address.update.useMutation({
+    const { mutate, isPending } = api.Address.update.useMutation({
       onSuccess: () => {
-        void ctx.address.getAll.invalidate();
+        void ctx.Address.getAll.invalidate();
       },
       onError: () => {
         toast({
