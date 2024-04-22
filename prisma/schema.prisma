@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -10,7 +10,7 @@ datasource db {
 }
 
 model credit_card {
-  card_id         Int       @id
+  card_id         Int       @id @default(autoincrement())
   cust_id         Int?
   firstname       String?   @db.VarChar(100)
   lastname        String?   @db.VarChar(100)
@@ -27,13 +27,14 @@ model customer {
   first_name       String?            @db.VarChar(100)
   last_name        String?            @db.VarChar(100)
   balance          Decimal?           @db.Decimal(10, 2)
+  username         String?            @db.VarChar(100)
   credit_card      credit_card[]
   customer_address customer_address[]
   orders           orders[]
 }
 
 model customer_address {
-  cust_address_id Int       @id
+  cust_address_id Int       @id @default(autoincrement())
   cust_id         Int?
   street_number   String?   @db.VarChar(100)
   street_name     String?   @db.VarChar(100)
@@ -55,7 +56,7 @@ model delivery_plan {
 
 model order_items {
   order_item_id Int      @id
-  order_id      Int?
+  order_id      Int?     
   product_id    Int?
   quantity      Int?
   orders        orders?  @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
@@ -63,7 +64,7 @@ model order_items {
 }
 
 model orders {
-  order_id       Int             @id
+  order_id       Int             @id @default(autoincrement())
   customer_id    Int?
   status         String?         @db.VarChar(100)
   credit_card_id Int?

@@ -9,7 +9,7 @@ export const CreditCardCreateInput = z.object({
   number: z.string().nullable(),
   security_number: z.string().nullable(),
   expiry_date: z.string().nullable(),
-  zip: z.string().nullable()
+  cust_id: z.number()
 });
 
 export const CreditCardUpdateInput = z
@@ -31,6 +31,12 @@ export const CreditCardRouter = createTRPCRouter({
     return ctx.db.credit_card.findMany();
   }),
 
+  getAllByCustId: publicProcedure
+    .input(CreditCardDeleteInput)
+    .query(({ ctx, input }) => {
+      return ctx.db.credit_card.findMany({ where: { cust_id: input.id } });
+    }),
+
   getSearch: publicProcedure.input(SearchInput).query(({ ctx, input }) => {
     const searchQuery = ctx.db.$queryRaw<
       credit_card[]
@@ -44,9 +50,10 @@ export const CreditCardRouter = createTRPCRouter({
   create: publicProcedure
     .input(CreditCardCreateInput)
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.credit_card.create({
+      const newCard = await ctx.db.credit_card.create({
         data: input
       });
+      return { card_id: newCard.card_id };
     }),
 
   update: publicProcedure

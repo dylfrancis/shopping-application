@@ -9,6 +9,7 @@ export const AddressCreateInput = z.object({
   city: z.string().nullable(),
   state: z.string().nullable(),
   zip: z.string().nullable(),
+  cust_id: z.number().nullable()
 });
 
 export const AddressUpdateInput = z
@@ -30,6 +31,16 @@ export const addressRouter = createTRPCRouter({
     return ctx.db.customer_address.findMany();
   }),
 
+  getAllByCustId: publicProcedure
+    .input(AddressDeleteInput)
+    .query(({ ctx, input }) => {
+      return ctx.db.customer_address.findMany({
+        where: {
+          cust_id: input.id
+        }
+      });
+    }),
+
   getSearch: publicProcedure.input(SearchInput).query(({ ctx, input }) => {
     const searchQuery = ctx.db.$queryRaw<
       customer_address[]
@@ -43,9 +54,10 @@ export const addressRouter = createTRPCRouter({
   create: publicProcedure
     .input(AddressCreateInput)
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.customer_address.create({
+      const address = await ctx.db.customer_address.create({
         data: input
       });
+      return { cust_address_id: address.cust_address_id };
     }),
 
   update: publicProcedure
