@@ -24,7 +24,7 @@ export default function Login() {
     void handleLoggedIn();
   }, [handleLoggedIn]);
 
-  const { data, mutate } = api.customer.getOne.useMutation({
+  const { mutate } = api.customer.getOne.useMutation({
     onSuccess: (response) => {
       localStorage.setItem('customer', JSON.stringify(response));
       void router.push('/customer');
