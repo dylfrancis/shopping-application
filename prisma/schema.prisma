@@ -10,7 +10,7 @@ datasource db {
 }
 
 model credit_card {
-  card_id         Int       @id
+  card_id         Int       @id @default(autoincrement())
   cust_id         Int?
   firstname       String?   @db.VarChar(100)
   lastname        String?   @db.VarChar(100)
@@ -34,7 +34,7 @@ model customer {
 }
 
 model customer_address {
-  cust_address_id Int       @id
+  cust_address_id Int       @id @default(autoincrement())
   cust_id         Int?
   street_number   String?   @db.VarChar(100)
   street_name     String?   @db.VarChar(100)
@@ -55,8 +55,8 @@ model delivery_plan {
 }
 
 model order_items {
-  order_item_id Int      @id @default(autoincrement())
-  order_id      Int?
+  order_item_id Int      @id
+  order_id      Int?     
   product_id    Int?
   quantity      Int?
   orders        orders?  @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 
-const OrderItemCreateInput = z.object({
+export const OrderItemCreateInput = z.object({
   order_id: z.number(),
   product_id: z.number(),
   quantity: z.number()
