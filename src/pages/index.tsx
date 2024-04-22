@@ -42,10 +42,13 @@ export default function Login() {
           name="username"
           control={control}
           render={({ field }) => (
-            <FormLabel>
-              Username
-              <Input {...field} />
-            </FormLabel>
+            <div>
+              {"Enter 'bob' for login"}
+              <FormLabel>
+                Username
+                <Input {...field} />
+              </FormLabel>
+            </div>
           )}
         />
         <Button colorScheme="blue" type="submit">
